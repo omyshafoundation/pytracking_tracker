@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Column Two Values</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #ffffff;
+            /* White background */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* Shadow at the bottom */
+            padding: 10px;
+            /* Adjust padding as needed */
+
+            width: 100%;
+
+        }
+
+        header img {
+            height: 40px;
+            /* Adjust the height of the logo */
+        }
+        #myPieChart {
+    border: 1px solid #ccc;
+    display: block;
+    margin: 20px auto 0; /* Centers the canvas below the header */
+}
+        /* Center align the card */
+        .card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* Adjust as needed */
+        }
+
+        /* Style the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* Style the selectable cells */
+        .selectable {
+            cursor: pointer;
+        }
+
+        /* Highlight selectable cells on hover */
+        .selectable:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Style the form */
+        #selectValueForm {
+            display: none;
+            /* Hide the form */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Your Logo">
+    </header>
+
+    <div class="card">
+        <form id="selectValueForm" action="{{ url_for('display_selected_value') }}" method="post">
+            <input type="hidden" id="selectedValueInput" name="selected_value">
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Select a value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for value in column_two_values %}
+                <tr>
+                    <td class="selectable" data-value="{{ value }}">{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Add click event listener to all elements with class "selectable"
+            var selectableElements = document.querySelectorAll(".selectable");
+
+            selectableElements.forEach(function (element) {
+                element.addEventListener("click", function () {
+                    // Set the selected value to the hidden input
+                    document.getElementById("selectedValueInput").value = element.getAttribute("data-value");
+
+                    // Submit the form
+                    document.getElementById("selectValueForm").submit();
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

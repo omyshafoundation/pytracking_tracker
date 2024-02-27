@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selected Value Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Style for Canvas */
+        #myPieChart {
+            border: 1px solid #ccc;
+            display: block;
+            /* Ensures the canvas is treated as a block-level element */
+            margin: 20px auto;
+            /* Centers the canvas on the page */
+        }
+
+        /* Style for Headers */
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #666;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        /* Style for Unordered List */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        /* Style for the data div */
+        #flaskValues {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #888;
+        }
+
+
+
+
+        header {
+            background-color: #ffffff;
+            /* White background */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* Shadow at the bottom */
+            padding: 10px;
+            /* Adjust padding as needed */
+
+            width: 100%;
+        }
+
+        header img {
+            height: 40px;
+            /* Adjust the height of the logo */
+        }
+
+        /* Center align the card */
+        .card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* Adjust as needed */
+        }
+
+        /* Style the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* Style the selectable cells */
+        .selectable {
+            cursor: pointer;
+        }
+
+        /* Highlight selectable cells on hover */
+        .selectable:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Style the form */
+        #selectValueForm {
+            display: none;
+            /* Hide the form */
+        }
+        h1 {
+    font-family: 'Poppins', sans-serif; /* Use Poppins font */
+    color: #000; /* Black color */
+    font-size: 24px;
+    font-weight: bold; /* Bold font weight */
+    margin-bottom: 10px;
+}
+h2,h3,th {
+    font-family: 'Poppins', sans-serif; /* Use Poppins font */
+    color: #000; /* Black color */
+    font-weight: bold; /* Bold font weight */
+
+}
+tr{
+    font-family: 'Poppins', sans-serif; /* Use Poppins font */
+    color: #000; /* Black color */
+  
+
+}
+.card {
+           
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif; 
+            height: 100px;
+        }
+
+        /* Style for the values */
+        .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            padding-right: 100px;
+            
+        }
+
+        /* Style for the second value */
+        .value2 {
+            font-size: 16px;
+            color: #666;
+            padding-right: 100px;
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Your Logo">
+    </header>
+    <h1>{{ selected_value }}</h1>
+    <canvas id="myPieChart" width="400" height="400"></canvas>
+
+    <div class="card">
+        <div class="value">Total Recipients</div>
+        <div class="value2">{{ number_of_recips }}</div>
+        <div class="value">Number of opens</div>
+        <div class="value2">{{ selected_users_num }}</div>
+        <div class="value">Open rate</div>
+        <div class="value2" id="open_percentage"></div>
+
+    </div>
+
+<h2>Recipients and Opens</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Opens</th>
+            <th>Recipients</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {% for user in selected_users %}
+                    <div>{{ user }}</div>
+                {% endfor %}
+            </td>
+            <td>
+                <ul>
+                    {% for item in all_recips %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<!-- Your existing code... -->
+
+    
+
+    <div id="flaskValues" data-selected-users-num="{{ selected_users_num }}"
+        data-number-of-recips="{{ number_of_recips }}"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var flaskValuesElement = document.getElementById('flaskValues');
+            var selectedUsersNum = flaskValuesElement.dataset.selectedUsersNum;
+            var numberOfRecips = flaskValuesElement.dataset.numberOfRecips;
+            
+            console.log('selectedUsersNum:', selectedUsersNum);
+            console.log('numberOfRecips:', numberOfRecips);
+
+            var data = {
+                labels: ['Number of Recipients', 'Remaining'],
+                datasets: [{
+                    data: [selectedUsersNum, selectedUsersNum - numberOfRecips],
+                    backgroundColor: ['#36a2eb', '#99c5e3'],
+                    hoverBackgroundColor: ['#000000', '#000000'],
+                    shadowColor: 'rgba(0, 0, 0, 0.3)', // Shadow color
+        shadowBlur: 10, // Shadow blur
+        shadowOffsetX: 0, // Shadow X offset
+        shadowOffsetY: 5, // Shadow Y offset
+                }]
+            };
+
+            var ctx = document.getElementById('myPieChart').getContext('2d');
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: data
+            });
+            var percent_of_open=selectedUsersNum/numberOfRecips*100;
+            document.getElementById("open_percentage").innerHTML = percent_of_open+"%";
+        });
+
+    </script>
+</body>
+
+</html>
